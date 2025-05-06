@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour
                 return;
             }
 
-            Vector3 dir = new Vector3(agent.steeringTarget.x - transform.position.x, 0f, agent.steeringTarget.z - transform.position.z);
+            Vector3 dir = new Vector3(agent.steeringTarget.x - body.transform.position.x, 0f, agent.steeringTarget.z - body.transform.position.z);
             body.transform.rotation = Quaternion.RotateTowards(body.transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * rotationSpeed);
             
             animator.SetBool("isMove", true);
