@@ -1,17 +1,22 @@
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
     public float moveSpeed;
+    public float rotationSpeed;
+    public Transform body;
+    public NavMeshAgent agent;
 
-    private bool isMove = false;
-    private Vector3 destination;    
+    public Animator animator;
+
+    private bool isMove = false;        
 
     void Awake()
     {
-        
+        agent.updateRotation = false;
     }
 
     void FixedUpdate()
@@ -28,15 +33,17 @@ public class PlayerController : MonoBehaviour
     {
         if (isMove)
         {
-            if (Vector3.Distance(transform.position, destination) <= 0.05f)
+            if (agent.velocity.magnitude == 0f)
             {
                 isMove = false;
+                animator.SetBool("isMove", false);
                 return;
             }
 
-            Vector3 dir = destination - transform.position;
-            transform.forward = dir;
-            transform.position += dir.normalized * Time.deltaTime * moveSpeed;
+            Vector3 dir = new Vector3(agent.steeringTarget.x - transform.position.x, 0f, agent.steeringTarget.z - transform.position.z);
+            body.transform.rotation = Quaternion.RotateTowards(body.transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * rotationSpeed);
+            
+            animator.SetBool("isMove", true);
         }        
     }
 
@@ -49,7 +56,7 @@ public class PlayerController : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit))
             {
-                destination = hit.point;
+                agent.SetDestination(hit.point);
                 isMove = true;
             }
         }
