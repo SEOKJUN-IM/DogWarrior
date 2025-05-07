@@ -4,15 +4,12 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("Movement")]
-    public float moveSpeed;
+    [Header("Movement")]    
     public float rotationSpeed;
     public Transform body;
     public NavMeshAgent agent;
 
-    public Animator animator;
-
-    private bool isMove = false;        
+    public Animator animator;         
 
     void Awake()
     {
@@ -31,20 +28,14 @@ public class PlayerController : MonoBehaviour
 
     void Move()
     {
-        if (isMove)
+        if (agent.velocity.magnitude > 0f)
         {
-            if (agent.velocity.magnitude == 0f)
-            {
-                isMove = false;
-                animator.SetBool("isMove", false);
-                return;
-            }
-
             Vector3 dir = new Vector3(agent.steeringTarget.x - body.transform.position.x, 0f, agent.steeringTarget.z - body.transform.position.z);
             body.transform.rotation = Quaternion.RotateTowards(body.transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * rotationSpeed);
-            
+
             animator.SetBool("isMove", true);
-        }        
+        }
+        else animator.SetBool("isMove", false);
     }
 
     // InputActions
@@ -54,11 +45,7 @@ public class PlayerController : MonoBehaviour
         if (context.phase == InputActionPhase.Performed)
         {
             RaycastHit hit;
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit))
-            {
-                agent.SetDestination(hit.point);
-                isMove = true;
-            }
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit)) agent.SetDestination(hit.point);            
         }
     }
 
