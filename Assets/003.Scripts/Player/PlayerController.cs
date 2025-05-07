@@ -1,6 +1,8 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {    
@@ -10,12 +12,15 @@ public class PlayerController : MonoBehaviour
     public NavMeshAgent agent;
 
     [Header("Dash")]
-    public float dashDistance;    
+    public float dashDistance;
+    public float dashCoolTime;
+    public Image dashCoolCheck;
+    public TextMeshProUGUI remainDashCoolTxt;    
     
     private Vector3 dashPoint;
     private bool isDash = false;
     private float dashTime = 0f;
-    private float lastDashTime;
+    private float remainDashCool;
 
     public Animator animator;       
 
@@ -79,6 +84,12 @@ public class PlayerController : MonoBehaviour
     // InputAction Dash
     public void Dash()
     {
+        remainDashCool -= Time.deltaTime;
+        if (remainDashCool <= 0f) remainDashCool = 0f;
+
+        dashCoolCheck.fillAmount = remainDashCool / dashCoolTime;
+        remainDashCoolTxt.text = $"{(int)remainDashCool}s";
+
         if (isDash)
         {
             transform.position = Vector3.MoveTowards(transform.position, dashPoint, Time.deltaTime * 15f);
@@ -96,7 +107,7 @@ public class PlayerController : MonoBehaviour
 
     public void OnDash(InputAction.CallbackContext context)
     {
-        if (context.phase == InputActionPhase.Performed)
+        if (remainDashCool == 0f && context.phase == InputActionPhase.Performed)
         {
             agent.isStopped = true;
 
@@ -109,6 +120,7 @@ public class PlayerController : MonoBehaviour
 
                 dashPoint = transform.position + dashDistance * dir.normalized;
                 isDash = true;
+                remainDashCool = dashCoolTime;
             }
         }
     }
