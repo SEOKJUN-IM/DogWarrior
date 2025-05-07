@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
     public Transform body;
     public NavMeshAgent agent;
 
-    public Animator animator;         
+    public Animator animator;       
 
     void Awake()
     {
@@ -54,7 +54,16 @@ public class PlayerController : MonoBehaviour
     {
         if (context.phase == InputActionPhase.Performed)
         {
-            Debug.Log("공격!");
+            agent.SetDestination(body.transform.position);
+
+            RaycastHit hit;
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit))
+            {
+                Vector3 dir = new Vector3(hit.point.x - body.transform.position.x, 0f, hit.point.z - body.transform.position.z);
+                body.transform.forward = dir;
+            }
+
+            animator.SetTrigger("onAttack");
         }
     }
 }
