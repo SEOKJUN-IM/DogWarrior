@@ -103,6 +103,7 @@ public class PlayerController : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit))
             {
+                agent.SetDestination(hit.point);
                 Vector3 dir = new Vector3(hit.point.x - body.transform.position.x, 0f, hit.point.z - body.transform.position.z);
                 body.transform.forward = dir;
 
